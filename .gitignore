@@ -1,0 +1,11 @@
+# Generated data: rebuild with python scripts/01_data_generation.py
+data/raw/*.csv
+data/processed/*.csv
+models/*.pkl
+
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/
+*.pbix.bak
+.DS_Store
