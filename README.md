@@ -105,8 +105,8 @@ Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib, seaborn), SQL, Power B
 
 1. Notebook 01, data generation and pattern checks: done
 2. Notebook 02, EDA and RFM segmentation: done
-3. Notebook 03, cohort retention: next
-4. Notebook 04, churn prediction model
+3. Notebook 03, cohort retention: done
+4. Notebook 04, churn prediction model: next
 5. Notebook 05, CLV and recommendations
 6. Power BI dashboard, five pages
 
