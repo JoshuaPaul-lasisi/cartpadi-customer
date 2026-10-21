@@ -1,96 +1,56 @@
-# CartPadi customer churn and retention analysis
+# Olist customer retention analysis
 
-Who buys again, who drops off, and how much revenue is at stake when they do: a churn and retention study of a Nigerian e-commerce marketplace.
+Why do 98% of customers on a Brazilian e-commerce platform never buy a second time, and what in their first order predicts whether they will? A retention study on 94,703 real customers and 97,905 orders.
 
-## Company brief
+## The business and the data
 
-CartPadi Nigeria Ltd. is a fictional pan-Nigerian B2C e-commerce marketplace. It sells electronics, phones, fashion, beauty, home and sports products to customers in 24 states, with Lagos and Abuja as its biggest markets. The dataset covers every customer who signed up between 1 January 2024 and 31 December 2025, their orders, the items in those orders, the product catalogue, and a sample of site sessions.
+Olist is a Brazilian company that connects small shops to large online marketplaces. Shops list through Olist, customers buy on the marketplace, and Olist manages the order through to delivery.
 
-## Data disclaimer
+The data is the "Brazilian E-Commerce Public Dataset by Olist", published by Olist on Kaggle: about 100,000 real, anonymised orders from September 2016 to October 2018, across nine linked tables (customers, orders, items, payments, reviews, products, sellers, category names and geolocation). Values are in Brazilian reais (R$).
 
-All data in this project is synthetic. CartPadi is not a real company and has no relation to any existing brand. Product brands are invented; any match to a real name is a coincidence. The generation script, `scripts/01_data_generation.py`, is the provenance of the data. It runs with a fixed seed (42), so anyone can rebuild the same five CSV files.
+Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attribution to Olist, and anything derived from it is shared under the same licence. The raw files are not stored in this repository.
+
+## Key findings so far
+
+1. 97.8% of customers bought on a single day. Only 1.98% came back within 180 days, and about 2.2% ever did. Under 1% of any monthly cohort buys again in any later month.
+2. About a third of apparent second orders are split carts placed the same day. Counting customers by `customer_id` hides repeat buying completely, because Olist issues a new `customer_id` for every order.
+3. Late parcels wreck reviews. More than three days late, 60% to 76% of customers leave one or two stars. Late orders are 8% of deliveries but a third of all bad reviews.
+4. Nothing in the first order moves the repeat rate much. The first order's category is the strongest signal: bed, bath and table, sports and furniture buyers return at up to 2.7 times the rate of gadget and car-part buyers. Review score and delivery speed show smaller real gaps, mostly explained by geography.
+5. Customer value is almost entirely the first order: only 1.5% of six-month spend comes after the first month.
 
 ## Project structure
 
 ```
-cartpadi-customer/
+  notebooks/
+    01_data_audit_and_preparation.ipynb   audit of the raw tables, builds the clean tables
+    02_eda_rfm_segmentation.ipynb         revenue, geography, delivery and reviews; RFM segments
+    03_cohort_retention_analysis.ipynb    cohort heatmap, time to second purchase, what predicts a return
+    04_repeat_purchase_model.ipynb        (in progress)
+    05_clv_and_recommendations.ipynb      (in progress)
   scripts/
-    01_data_generation.py    builds the five raw CSVs
-    validate_patterns.py     checks the injected patterns in the raw data
-    build_notebook_0X.py     writes each notebook from source (edit these, not the .ipynb)
+    build_notebook_0X.py                  writes each notebook from source (edit these, not the .ipynb)
   src/
-    cartpadi.py              shared paths, data cleaning and chart style
+    olist.py                              shared paths, loading, chart style and helpers
   data/
-    raw/                     generated CSVs (not committed, rebuild with the script)
-    processed/               notebook outputs (RFM, cohorts, churn scores, CLV)
-  notebooks/                 01 to 05 analysis notebooks
-  models/                    trained churn model
-  dashboard/                 Power BI file
-  reports/figures/           exported charts and the executive summary
-  requirements.txt
+    raw/                                  Olist CSVs from Kaggle (not committed)
+    processed/                            clean tables and notebook outputs (not committed, rebuilt by the notebooks)
+  reports/figures/                        every chart the notebooks save
+  models/                                 trained model
 ```
-
-## The data
-
-Snapshot date is 31 December 2025. A customer is churned when they have placed no non-cancelled order in the 90 days up to the snapshot.
-
-| File | Rows | Grain |
-|---|---|---|
-| customers.csv | 25,000 | one row per customer |
-| orders.csv | about 121,000 | one row per order |
-| order_items.csv | about 275,000 | one row per order line |
-| products.csv | 2,000 | one row per product |
-| sessions.csv | 480,000 | one row per site session (about a 15% sample of the full log) |
-
-Notes on the columns:
-
-1. `order_total_ngn` is the sum of line values after discount. `discount_ngn` is the naira value of those discounts. Both reconcile to `order_items.csv` to the kobo.
-2. `discount_pct` is a percentage (15.0 means 15%).
-3. `unit_price_ngn` is the list price on the order date. `base_price_ngn` in products is the list price at the snapshot; prices rise about 28% across the two years.
-4. `delivery_days` is empty for cancelled orders.
-5. `customer_id` in sessions is empty for anonymous visitors (about 31% of sessions).
-6. Sessions are a sample, so not every order has a matching converted session.
-
-The raw files carry two known quality issues for the EDA audit to catch: about 0.15% of order rows are exported twice, and about 0.8% of customers have no city.
-
-## Patterns in the data (seed 42)
-
-These are the behaviours the generator builds in, measured on the output by `validate_patterns.py`. Ninety-day retention here means a second order within 90 days of the first, for customers whose first order was at least 90 days before the snapshot.
-
-| Pattern | Target | Generated |
-|---|---|---|
-| Customers with 1 / 2 to 4 / 5+ orders | 55% / 25% / 20% | 55.9% / 22.5% / 21.6% |
-| Median days to second order | 28 | 28 |
-| 90-day retention, referral | 45% | 41.9% |
-| 90-day retention, email | 40% | 39.1% |
-| 90-day retention, direct | 38% | 35.3% |
-| 90-day retention, organic search | 32% | 31.6% |
-| 90-day retention, paid social | 20% | 19.0% |
-| 90-day retention, CartPadi wallet first order | 40% | 42.2% |
-| 90-day retention, card | 28% | 32.3% |
-| 90-day retention, bank transfer / USSD | 25% | 30.4% / 28.0% |
-| 90-day retention, pay on delivery | 17% | 22.0% |
-| Q4 signups vs Q1 to Q2 signups, 90-day retention | 30% lower | 31% lower |
-| Nov / Dec / Apr / Jan orders vs a normal month (2025) | 2.5 / 2.2 / 1.4 / 0.7 | 2.56 / 2.22 / 1.42 / 0.68 |
-| Electronics vs Fashion first-buyer LTV | 3.2x | 3.4x |
-| Highest category repurchase rate | Beauty and Skincare | Beauty and Skincare |
-| Highest average order value | Phones and Accessories | Phones and Accessories |
-| Lagos share of customers / revenue | 43% / 51% | 42.9% / 51.8% |
-| Abuja share of customers / revenue | 14% / 17% | 13.7% / 17.0% |
-| Mean delivery days, Lagos vs outside top 5 states | 3 to 5 vs 8 to 14 | 4.0 vs 11.5 |
-| Session conversion rate | about 3.5% | 3.7% |
-
-Channel and payment effects overlap in the same customers, so both sets of targets can't land exactly at once. The order of best to worst holds for both. The 2024 seasonal peaks look sharper than 2025 because the customer base starts from zero in January 2024.
 
 ## How to run
 
+1. Download the dataset from Kaggle: search "Brazilian E-Commerce Public Dataset by Olist" (olistbr/brazilian-ecommerce).
+2. Unzip the CSV files into `data/raw/`.
+3. Install and run:
+
 ```
 pip install -r requirements.txt
-python scripts/01_data_generation.py
-python scripts/validate_patterns.py
+cd notebooks
+jupyter nbconvert --to notebook --execute --inplace 01_data_audit_and_preparation.ipynb
 ```
 
-The generator takes about 10 seconds. Then run the notebooks in order, 01 to 05, from the `notebooks` folder. Each notebook is written by a script in `scripts/`, so to change one, edit its builder and run:
+Run the notebooks in order, 01 first: it writes the clean tables the others read. To change a notebook, edit its builder in `scripts/` and rebuild:
 
 ```
 python scripts/build_notebook_02.py
@@ -99,16 +59,16 @@ jupyter nbconvert --to notebook --execute --inplace notebooks/02_eda_rfm_segment
 
 ## Tools and libraries
 
-Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib, seaborn), SQL, Power BI.
+Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), SQL, Power BI.
 
 ## Build status
 
-1. Notebook 01, data generation and pattern checks: done
+1. Notebook 01, data audit and preparation: done
 2. Notebook 02, EDA and RFM segmentation: done
 3. Notebook 03, cohort retention: done
-4. Notebook 04, churn prediction model: next
+4. Notebook 04, repeat-purchase model: next
 5. Notebook 05, CLV and recommendations
-6. Power BI dashboard, five pages
+6. Power BI dashboard
 
 ## Contact
 
