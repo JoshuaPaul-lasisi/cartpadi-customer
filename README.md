@@ -17,6 +17,9 @@ cartpadi-customer/
   scripts/
     01_data_generation.py    builds the five raw CSVs
     validate_patterns.py     checks the injected patterns in the raw data
+    build_notebook_0X.py     writes each notebook from source (edit these, not the .ipynb)
+  src/
+    cartpadi.py              shared paths, data cleaning and chart style
   data/
     raw/                     generated CSVs (not committed, rebuild with the script)
     processed/               notebook outputs (RFM, cohorts, churn scores, CLV)
@@ -87,7 +90,12 @@ python scripts/01_data_generation.py
 python scripts/validate_patterns.py
 ```
 
-The generator takes about 10 seconds. Then run the notebooks in order, 01 to 05.
+The generator takes about 10 seconds. Then run the notebooks in order, 01 to 05, from the `notebooks` folder. Each notebook is written by a script in `scripts/`, so to change one, edit its builder and run:
+
+```
+python scripts/build_notebook_02.py
+jupyter nbconvert --to notebook --execute --inplace notebooks/02_eda_rfm_segmentation.ipynb
+```
 
 ## Tools and libraries
 
@@ -95,9 +103,9 @@ Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib, seaborn), SQL, Power B
 
 ## Build status
 
-1. Data generation script and pattern checks: done
-2. Notebook 02, EDA and RFM segmentation: next
-3. Notebook 03, cohort retention
+1. Notebook 01, data generation and pattern checks: done
+2. Notebook 02, EDA and RFM segmentation: done
+3. Notebook 03, cohort retention: next
 4. Notebook 04, churn prediction model
 5. Notebook 05, CLV and recommendations
 6. Power BI dashboard, five pages
