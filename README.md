@@ -10,13 +10,16 @@ The data is the "Brazilian E-Commerce Public Dataset by Olist", published by Oli
 
 Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attribution to Olist, and anything derived from it is shared under the same licence. The raw files are not stored in this repository.
 
-## Key findings so far
+## Key findings
 
 1. 97.8% of customers bought on a single day. Only 1.98% came back within 180 days, and about 2.2% ever did. Under 1% of any monthly cohort buys again in any later month.
 2. About a third of apparent second orders are split carts placed the same day. Counting customers by `customer_id` hides repeat buying completely, because Olist issues a new `customer_id` for every order.
 3. Late parcels wreck reviews. More than three days late, 60% to 76% of customers leave one or two stars. Late orders are 8% of deliveries but a third of all bad reviews.
 4. Nothing in the first order moves the repeat rate much. The first order's category is the strongest signal: bed, bath and table, sports and furniture buyers return at up to 2.7 times the rate of gadget and car-part buyers. Review score and delivery speed show smaller real gaps, mostly explained by geography.
-5. Customer value is almost entirely the first order: only 1.5% of six-month spend comes after the first month.
+5. The first order says little about whether a customer will return. The best model (random forest, tested out of time on later customers) reaches a ROC AUC of 0.58. It is useful for one thing: its top 10% of scores returned at 1.8 times the average rate.
+6. Customer value is almost entirely the first order. Raising the 180-day repeat rate from 2% to 3% would add about R$129,000 of GMV a year (1%), so retention spend has to be cheap: email, timing and category targeting, with any voucher tested against a hold-out group first.
+
+![Summary](reports/figures/05_executive_summary.png)
 
 ## Project structure
 
@@ -25,8 +28,8 @@ Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attributi
     01_data_audit_and_preparation.ipynb   audit of the raw tables, builds the clean tables
     02_eda_rfm_segmentation.ipynb         revenue, geography, delivery and reviews; RFM segments
     03_cohort_retention_analysis.ipynb    cohort heatmap, time to second purchase, what predicts a return
-    04_repeat_purchase_model.ipynb        (in progress)
-    05_clv_and_recommendations.ipynb      (in progress)
+    04_repeat_purchase_model.ipynb        predicts a second purchase within 180 days from the first order
+    05_clv_and_recommendations.ipynb      customer value, size of the prize, playbook, one-page summary
   scripts/
     build_notebook_0X.py                  writes each notebook from source (edit these, not the .ipynb)
   src/
@@ -66,9 +69,9 @@ Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), SQL, Power BI.
 1. Notebook 01, data audit and preparation: done
 2. Notebook 02, EDA and RFM segmentation: done
 3. Notebook 03, cohort retention: done
-4. Notebook 04, repeat-purchase model: next
-5. Notebook 05, CLV and recommendations
-6. Power BI dashboard
+4. Notebook 04, repeat-purchase model: done
+5. Notebook 05, CLV and recommendations: done
+6. Power BI dashboard: next. It reads the tables in `data/processed/` (customers, orders_enriched, rfm_segments, cohort_retention, repeat_scores, clv_scores).
 
 ## Contact
 
