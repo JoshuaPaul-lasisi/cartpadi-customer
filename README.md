@@ -30,8 +30,6 @@ Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attributi
     03_cohort_retention_analysis.ipynb    cohort heatmap, time to second purchase, what predicts a return
     04_repeat_purchase_model.ipynb        predicts a second purchase within 180 days from the first order
     05_clv_and_recommendations.ipynb      customer value, size of the prize, playbook, one-page summary
-  scripts/
-    build_notebook_0X.py                  writes each notebook from source (edit these, not the .ipynb)
   src/
     olist.py                              shared paths, loading, chart style and helpers
   data/
@@ -53,16 +51,11 @@ cd notebooks
 jupyter nbconvert --to notebook --execute --inplace 01_data_audit_and_preparation.ipynb
 ```
 
-Run the notebooks in order, 01 first: it writes the clean tables the others read. To change a notebook, edit its builder in `scripts/` and rebuild:
-
-```
-python scripts/build_notebook_02.py
-jupyter nbconvert --to notebook --execute --inplace notebooks/02_eda_rfm_segmentation.ipynb
-```
+Run the notebooks in order, 01 first: it writes the clean tables the others read. You can also open them in Jupyter or VS Code and run all cells.
 
 ## Tools and libraries
 
-Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), SQL, Power BI.
+Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), Jupyter.
 
 ## Build status
 
