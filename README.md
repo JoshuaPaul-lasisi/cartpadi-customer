@@ -30,8 +30,18 @@ Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attributi
     03_cohort_retention_analysis.ipynb    cohort heatmap, time to second purchase, what predicts a return
     04_repeat_purchase_model.ipynb        predicts a second purchase within 180 days from the first order
     05_clv_and_recommendations.ipynb      customer value, size of the prize, playbook, one-page summary
+  sql/
+    00_views.sql                          clean order and customer tables built in SQL from the raw CSVs
+    01_ to 06_*.sql                       headline KPIs, monthly GMV, cohorts, repeat by category,
+                                          delivery and reviews, RFM segments
+  scripts/
+    run_sql.py                            runs the SQL with DuckDB and checks it against the notebooks
   src/
     olist.py                              shared paths, loading, chart style and helpers
+  docs/
+    power_bi_guide.md                     step-by-step build guide for the dashboard
+    olist_theme.json                      Power BI theme matching the notebook charts
+  dashboard/                              Power BI file
   data/
     raw/                                  Olist CSVs from Kaggle (not committed)
     processed/                            clean tables and notebook outputs (not committed, rebuilt by the notebooks)
@@ -53,9 +63,28 @@ jupyter nbconvert --to notebook --execute --inplace 01_data_audit_and_preparatio
 
 Run the notebooks in order, 01 first: it writes the clean tables the others read. You can also open them in Jupyter or VS Code and run all cells.
 
+4. Run the SQL version (from the repository root):
+
+```
+python scripts/run_sql.py --check
+```
+
+The SQL rebuilds the clean tables from the raw CSVs on its own, using the same rules as notebook 01, then reproduces the headline KPIs, cohort matrix, repeat rates, delivery figures and RFM segments. With `--check` it compares each result with the notebook outputs. All ten checks match; the only gap is 46 customers whose first order had two items at the same top price, where SQL and pandas pick a different lead item.
+
+5. Build the dashboard by following `docs/power_bi_guide.md`.
+
+## Limits of this analysis
+
+1. The data stops in August 2018 and covers 20 usable months. The 180-day repeat rate can only be measured for customers who first bought before March 2018, and any longer-term value is out of reach.
+2. Olist sells through marketplaces under each shop's name. The data can't show whether a customer bought again from the same shop on a channel Olist doesn't handle, so "never came back" means never came back through Olist.
+3. There is no data on marketing, emails, site visits or customer demographics, the things most likely to explain who returns. The model only sees the first order, which is why it is weak.
+4. Olist's commission and costs are not public, so value is measured as GMV (what customers paid). The voucher test in notebook 05 uses margin scenarios instead of a real margin.
+5. Delivery problems are tied up with geography: slow parcels mostly go to distant states. The notebooks show the association but can't prove that faster delivery alone would change how often customers return.
+6. No experiment was run. Every recommendation that involves an offer or a message should be tested against a hold-out group before rollout.
+
 ## Tools and libraries
 
-Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), Jupyter.
+Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), Jupyter, SQL (DuckDB), Power BI.
 
 ## Build status
 
@@ -64,7 +93,12 @@ Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), Jupyter.
 3. Notebook 03, cohort retention: done
 4. Notebook 04, repeat-purchase model: done
 5. Notebook 05, CLV and recommendations: done
-6. Power BI dashboard: next. It reads the tables in `data/processed/` (customers, orders_enriched, rfm_segments, cohort_retention, repeat_scores, clv_scores).
+6. SQL layer: done
+7. Power BI dashboard: build guide done, dashboard next. It reads the tables in `data/processed/`.
+
+## Licence
+
+The code in this repository is under the MIT licence (see `LICENSE`). The Olist data and anything derived from it, including the processed tables and the dashboard file, stay under CC BY-NC-SA 4.0 with attribution to Olist.
 
 ## Contact
 

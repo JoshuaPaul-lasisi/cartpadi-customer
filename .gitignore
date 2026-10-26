@@ -9,3 +9,4 @@ __pycache__/
 venv/
 *.pbix.bak
 .DS_Store
+data/processed/*.json
