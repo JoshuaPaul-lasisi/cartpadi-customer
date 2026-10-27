@@ -31,7 +31,7 @@ Leave empty cells as null. `repeat_180d` is empty on purpose for customers whose
 ### 1.3 Add columns in Power Query
 
 1. In orders_enriched, add a column `purchase_date`: Add Column, Custom Column, `Date.From([purchase_ts])`.
-2. In cohort_retention, add a column `cohort_date`: `Date.FromText([cohort_month] & "-01")`, typed as Date.
+2. In cohort_retention, look at the icon in the `cohort_month` header. Power BI often reads "2017-01" as a date on its own and shows a calendar icon. If it does, that column is already the cohort date: skip this step and use `cohort_month` wherever this guide says `cohort_date`. If the icon is "ABC" (text), add a column `cohort_date`: Add Column, Custom Column, `Date.FromText([cohort_month] & "-01")`, then set its type to Date. Adding the custom column to a `cohort_month` that is already a date fails, because a date can't be joined to text, and the failed cells load into Power BI as blanks.
 3. Rename the queries: orders_enriched to Orders, customers to Customers, cohort_retention to Cohorts.
 
 ### 1.4 Merge the customer tables into one
