@@ -30,7 +30,7 @@ Leave empty cells as null. `repeat_180d` is empty on purpose for customers whose
 
 ### 1.3 Add columns in Power Query
 
-1. In orders_enriched, add a column `purchase_date`: Add Column, Custom Column, `Date.From([purchase_ts])`.
+1. In orders_enriched, add a column `purchase_date`: Add Column, Custom Column, `Date.From([purchase_ts])`. Then click the icon in its header and set the type to Date. A custom column arrives untyped and Power BI loads it as text, and a text column can't join to the Date table in step 1.5.
 2. In cohort_retention, look at the icon in the `cohort_month` header. Power BI often reads "2017-01" as a date on its own and shows a calendar icon. If it does, that column is already the cohort date: skip this step and use `cohort_month` wherever this guide says `cohort_date`. If the icon is "ABC" (text), add a column `cohort_date`: Add Column, Custom Column, `Date.FromText([cohort_month] & "-01")`, then set its type to Date. Adding the custom column to a `cohort_month` that is already a date fails, because a date can't be joined to text, and the failed cells load into Power BI as blanks.
 3. Rename the queries: orders_enriched to Orders, customers to Customers, cohort_retention to Cohorts.
 
@@ -172,6 +172,25 @@ The number at the front keeps the bands in order on an axis.
 ## 3. Pages
 
 Every page gets the same layout: a title text box top left, a one-line takeaway under it, KPI cards across the top, charts below. Keep to one or two colours per chart; grey for context.
+
+### Layout grid
+
+The page is 1280 by 720. Set each visual's position and size exactly under Format, General, Properties, so nothing overlaps and the gaps are even (20 pixels at the edges and between visuals).
+
+| Zone | x | y | Width | Height |
+|---|---|---|---|---|
+| Title text box | 20 | 10 | 1240 | 40 |
+| Takeaway text box | 20 | 50 | 1240 | 30 |
+| Card row, four cards | 20, 330, 640, 950 | 90 | 290 | 100 |
+| Card row, three cards | 20, 440, 860 | 90 | 400 | 100 |
+| Two charts side by side | 20 and 650 | 210 | 610 | 490 |
+| Three charts in a row | 20, 440, 860 | 210 | 400 | 490 |
+| One wide chart and one narrow | 20 and 860 | 210 | 820 and 400 | 490 |
+| Source line (page 1 only) | 20 | 700 | 1240 | 20 |
+
+For the cohort matrix on page 4, use the wide slot (820 by 490). Twenty cohorts by twelve months needs the room.
+
+Cards look better short and wide than square: 100 pixels high is enough for one number and its label.
 
 ### Page 1: Overview
 
