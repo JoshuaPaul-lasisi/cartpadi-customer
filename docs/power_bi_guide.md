@@ -38,10 +38,16 @@ Leave empty cells as null. `repeat_180d` is empty on purpose for customers whose
 
 The four customer files share `customer_unique_id`. Fold them into Customers so the model has one customer table, not four.
 
-1. Select Customers. Home, Merge Queries. Pick rfm_segments, match on `customer_unique_id`, join kind Left Outer. Expand only `segment`, `R` and `M`.
-2. Repeat with repeat_scores, expanding `p_repeat_180d` and `return_tier`.
-3. Repeat with clv_scores, expanding `expected_repeat_value_180d` and `customer_value`.
-4. Right-click rfm_segments, repeat_scores and clv_scores and untick Enable load. They stay as sources but don't clutter the model.
+1. Select Customers in the Queries pane on the left. Home, Merge Queries (the top half of the button, not "as New").
+2. In the Merge window, Customers is already at the top. In the dropdown below it pick rfm_segments. Click the `customer_unique_id` header in both tables so both turn green. Join kind: Left Outer. The bar at the bottom should say 94,703 of 94,703 rows matched. Click OK.
+3. A new column appears at the far right of Customers, named rfm_segments, with "Table" in every cell. Each cell holds that customer's matching row from rfm_segments, folded up. Expanding unfolds it into ordinary columns.
+4. Click the icon with two arrows pointing apart in that column's header. In the list that opens, untick (Select All Columns), then tick only `segment`, `R` and `M`. Untick "Use original column name as prefix" at the bottom, or the columns arrive as `rfm_segments.segment`. Click OK.
+5. Repeat steps 1 to 4 with repeat_scores, ticking only `p_repeat_180d` and `return_tier`.
+6. Repeat with clv_scores, ticking only `expected_repeat_value_180d` and `customer_value`.
+7. Check the row count at the bottom left of Power Query: Customers should still have 94,703 rows. More rows would mean a merge matched some customers twice.
+8. Right-click rfm_segments, repeat_scores and clv_scores in the Queries pane and untick Enable load. They stay as sources but don't clutter the model.
+
+Only tick the columns listed. The score files also carry `customer_state`, `total_spend` and other columns that Customers already has, and expanding them would create duplicates.
 
 Close and Apply.
 
