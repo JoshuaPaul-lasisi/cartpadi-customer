@@ -41,7 +41,9 @@ Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attributi
   docs/
     power_bi_guide.md                     step-by-step build guide for the dashboard
     olist_theme.json                      Power BI theme matching the notebook charts
-  dashboard/                              Power BI file
+  dashboard/
+    olist_retention.pbix                  Power BI report, five pages
+    olist_retention.pdf                   the same report as a PDF
   data/
     raw/                                  Olist CSVs from Kaggle (not committed)
     processed/                            clean tables and notebook outputs (not committed, rebuilt by the notebooks)
@@ -71,7 +73,31 @@ python scripts/run_sql.py --check
 
 The SQL rebuilds the clean tables from the raw CSVs on its own, using the same rules as notebook 01, then reproduces the headline KPIs, cohort matrix, repeat rates, delivery figures and RFM segments. With `--check` it compares each result with the notebook outputs. All ten checks match; the only gap is 46 customers whose first order had two items at the same top price, where SQL and pandas pick a different lead item.
 
-5. Build the dashboard by following `docs/power_bi_guide.md`.
+5. Open `dashboard/olist_retention.pbix` in Power BI Desktop. It was built from the tables in `data/processed/`; to rebuild it from scratch, follow `docs/power_bi_guide.md`. If you open the file on a new machine, point its data source at your own `data/processed/` folder (Transform data, Data source settings).
+
+## Dashboard
+
+Five Power BI pages built on the notebook outputs. Every figure was checked against the notebooks and the SQL.
+
+1. Overview: customers, GMV, repeat rate, monthly GMV, and how many days each customer bought on.
+
+![Overview](reports/figures/dashboard_1_overview.png)
+
+2. Orders and geography: revenue by category, delivery time by state, payment mix.
+
+![Orders and geography](reports/figures/dashboard_2_orders_geography.png)
+
+3. Delivery and reviews: bad-review share by how late the parcel arrived, late rate by state.
+
+![Delivery and reviews](reports/figures/dashboard_3_delivery_reviews.png)
+
+4. Cohorts and repeat buying: the cohort heatmap and 180-day repeat rate by first category.
+
+![Cohorts and repeat buying](reports/figures/dashboard_4_cohorts.png)
+
+5. Segments and targeting: RFM segments, the model's return tiers and the action list of recent High-tier customers.
+
+![Segments and targeting](reports/figures/dashboard_5_segments.png)
 
 ## Limits of this analysis
 
@@ -94,7 +120,7 @@ Python (pandas, NumPy, scikit-learn, XGBoost, Matplotlib), Jupyter, SQL (DuckDB)
 4. Notebook 04, repeat-purchase model: done
 5. Notebook 05, CLV and recommendations: done
 6. SQL layer: done
-7. Power BI dashboard: build guide done, dashboard next. It reads the tables in `data/processed/`.
+7. Power BI dashboard: done
 
 ## Licence
 
