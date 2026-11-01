@@ -21,6 +21,10 @@ Licence: CC BY-NC-SA 4.0. The data is free for non-commercial use with attributi
 
 ![Summary](reports/figures/05_executive_summary.png)
 
+## Follow-on project
+
+The findings above say what to do. [Olist retention intervention analytics](https://github.com/JoshuaPaul-lasisi/retention-intervention-analytics) builds the layer that makes it operable: a dbt project on BigQuery that rebuilds these rules as tested models and produces the email targeting list by first category, the send window for each category, seller delivery performance by month, and the eligible population for a voucher test against a hold-out group. Its figures match this analysis exactly (94,703 customers, 1.98% 180-day repeat rate).
+
 ## Project structure
 
 ```
